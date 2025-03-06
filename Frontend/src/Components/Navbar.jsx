@@ -13,11 +13,11 @@ function Navbar() {
 
     return (
         <header
-            className='fixed bg-transparent w-full top-0 z-40'
+            className='fixed bg-transparent backdrop-blur-lg w-full top-0 z-40'
         >
             <div className='container mx-auto px-4 h-16'>
                 <div className='flex items-center justify-between h-full'>
-                    <Link to={`/home`} className='flex items-center gap-2.5 hover:opacity-80 transition-all'>
+                    <Link to={`/`} className='flex items-center gap-2.5 hover:opacity-80 transition-all'>
                         <img src={ChatAppLogo} alt="App Logo" className='size-20' />
                         <h1 className='text-lg font-bold`'>BINGO</h1>
                     </Link>
@@ -31,7 +31,7 @@ function Navbar() {
                                     <FaUserCircle className='size-5 hover:animate-pulse hover:size-7' />
                                 </Link>
 
-                                <MdLogout className='size-5 hover:size-7' onClick={logout} />
+                                <Link to={`/login`}><MdLogout className='size-5 hover:size-7' onClick={logout} /></Link>
                             </>
                         )}
 

@@ -24,7 +24,7 @@ function ChatHeader() {
                         </p>
                     </div>
                 </div>
-                <button onClick={()=> setSelectedUser(Null)}>
+                <button onClick={()=> setSelectedUser(null)} className="cursor-pointer">
                     <X/>
                 </button>
             </div>
