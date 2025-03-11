@@ -27,6 +27,27 @@ io.on("connection", (socket) => {
   // io.emit() is used to send events to all the connected clients
   io.emit("getOnlineUsers", Object.keys(userSocketMap));
 
+  // **JOIN GROUP CHAT**
+  socket.on("joinGroup", ({ groupId }) => {
+    socket.join(groupId);
+    console.log(`User ${userId} joined group ${groupId}`);
+  });
+
+  // **SEND GROUP MESSAGE**
+  socket.on("sendGroupMessage", async ({ groupId, senderId, message }) => {
+    try {
+      const newMessage = { sender: senderId, groupId, text: message, timestamp: Date.now() };
+
+      // Broadcast message to everyone in the group
+      io.to(groupId).emit("receiveGroupMessage", newMessage);
+    } catch (error) {
+      console.error("Error sending message:", error);
+    }
+  });
+
+
+
+
   socket.on("disconnect", () => {
     console.log("A user disconnected", socket.id);
     delete userSocketMap[userId];

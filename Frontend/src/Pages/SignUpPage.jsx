@@ -8,7 +8,7 @@ import ChatAppLogo from "../assets/ChatAppLogo.png"
 import { useAuthStore } from '../lib/useAuthStore';
 import { Loader2 } from 'lucide-react';
 import toast from 'react-hot-toast';
-
+ 
 export default function SignUpPage() {
     const [showPassword, setShowPassword] = useState(false)
     const [formData, setFormData] = useState({  fullName: '', email: '', password: '' })
@@ -34,7 +34,7 @@ export default function SignUpPage() {
     }
     
     return (
-        <div className="w-full h-screen flex justify-center items-center bg-gradient-to-br from-[#4ffbec] to-[#d83bfc]">
+        <div className="w-full h-screen flex justify-center items-center ">
             
                 <div className="h-full w-full p-6 flex flex-col justify-center items-center">
                     <div className='w-1/2 flex flex-col justify-center'>

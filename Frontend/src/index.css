@@ -1,5 +1,7 @@
 @import "tailwindcss";
-@plugin "daisyui";
+@plugin "daisyui" {
+  themes: all;
+}
 .no-scrollbar {
     -ms-overflow-style: none; 
     scrollbar-width: none;

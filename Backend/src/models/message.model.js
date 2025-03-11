@@ -1,6 +1,6 @@
 import mongoose from "mongoose";
 
-const messageSchema = new mongoose.Schema(
+export const messageSchema = new mongoose.Schema(
   {
     senderId: {
       type: mongoose.Schema.Types.ObjectId,
@@ -18,6 +18,10 @@ const messageSchema = new mongoose.Schema(
     image: {
       type: String,
     },
+    groupId: {
+      type: mongoose.Schema.Types.ObjectId, ref: "Group", default: null
+    },
+
   },
   { timestamps: true }
 );

@@ -24,7 +24,7 @@ function ProfilePage() {
     }
 
     return (
-        <div className='h-auto pt-20 bg-gradient-to-br from-[#4ffbec] to-[#d83bfc]'>
+        <div className='min-h-screen pt-20'>
             <div className='max-w-2xl mx-auto p-4 py-8 bg-white/20 backdrop-blur-md'>
                 <div className=' rounded-xl p-6 space-y-8'>
                     <div className='text-center'>
@@ -38,12 +38,12 @@ function ProfilePage() {
                                 className='size-32 rounded-full object-cover border-4' />
                             <label htmlFor="avatar-upload"
                                 className={` absolute bottom-0 right-0 bg-base-content hover:scale-105 p-2 rounded-full cursor-pointer transition-all duration-200 ${isUpdatingProfile ? "animate-pulse pointer-events-auto" : ""} `}>
-                                <FaCamera className='size-6 p-1 text-base-200 bg-white rounded-full ' />
+                                <FaCamera className='size-5 text-base-200 bg-white rounded-full ' />
                                 <input type="file" id='avatar-upload' className='hidden' accept='image/*' onChange={handleImageUpload} disabled={isUpdatingProfile} />
                             </label>
                         </div>
                         <p className='text-sm text-[#444]'>
-                            {isUpdatingProfile ? "Uploading..." : "Click the Camera icon to Update you Photo"}
+                            {isUpdatingProfile ? "Uploading..." : "Click the icon to Update you Photo"}
                         </p>
                     </div>
                     <div className='space-y-6'>

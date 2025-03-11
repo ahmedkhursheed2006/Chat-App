@@ -25,7 +25,7 @@ export default function LoginPage() {
     };
 
     return (
-        <div className="w-full h-screen flex justify-center items-center bg-gradient-to-br from-[#4ffbec] to-[#d83bfc]">
+        <div className="w-full h-screen flex justify-center items-center">
 
             <div className="h-full w-full p-6 flex flex-col justify-center items-center">
                 <div className='w-1/2 flex flex-col justify-center'>
