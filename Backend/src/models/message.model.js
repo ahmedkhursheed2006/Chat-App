@@ -18,9 +18,6 @@ export const messageSchema = new mongoose.Schema(
     image: {
       type: String,
     },
-    groupId: {
-      type: mongoose.Schema.Types.ObjectId, ref: "Group", default: null
-    },
 
   },
   { timestamps: true }

@@ -8,24 +8,26 @@ import GroupCard from './GroupCard';
 
 function Sidebar() {
     const { getUsers, users, selectedUser, setSelectedUser, isUsersLoading } = useChatStore();
-    const { setGroupCardOpen, groupCardOpen, selectedGroup, setSelectedGroup, groups } = useGroupStore();
+    const { setGroupCardOpen, groupCardOpen, setSelectedGroup, groups, getGroups } = useGroupStore();
     const { onlineUsers } = useAuthStore();
+
 
     const [showOnlineOnly, setOnlineShowOnly] = useState(false);
     const [activeTab, setActiveTab] = useState('contacts'); // "contacts" | "dm" | "groups"
 
     useEffect(() => {
         getUsers();
-    }, [getUsers]);
+        getGroups();
+    }, [getUsers, getGroups]);
 
     const filteredUsers = showOnlineOnly ? users.filter(user => onlineUsers.includes(user._id)) : users;
 
     if (isUsersLoading) return <SidebarSkeleton />;
 
     return (
-        <aside className='h-full w-20 lg:w-72 border-b border-base-300 flex flex-col transition-all duration-200'>
+        <aside className='h-full w-20 lg:w-72 border-4 border-r-0 border-[#ccc] rounded-l-lg flex flex-col transition-all duration-200 '>
             {/* Tabs for Navigation */}
-            <div className="border-b border-base-300 w-full p-3 flex justify-around">
+            <div className="border-b border-base-300 w-full p-1.5 flex justify-around">
                 <button
                     className={`flex flex-col items-center p-2 ${activeTab === "contacts" ? "text-blue-500" : "text-gray-500"}`}
                     onClick={() => setActiveTab("contacts")}
@@ -72,7 +74,7 @@ function Sidebar() {
                     filteredUsers.map((user) => (
                         <button
                             key={user._id}
-                            onClick={() => setSelectedUser(user)}
+                            onClick={() => {setSelectedUser(user); setSelectedGroup(null)}}
                             className={`w-full p-3 flex items-center gap-3 hover:bg-base-300 transition-colors
                                 ${selectedUser?._id === user._id ? "bg-base-300 ring-1 ring-base-300" : ""}`}
                         >
@@ -97,7 +99,7 @@ function Sidebar() {
                     users.map((user) => (
                         <button
                             key={user._id}
-                            onClick={() => setSelectedUser(user)}
+                            onClick={() => {setSelectedUser(user); setSelectedGroup(null)}}
                             className={`w-full p-3 flex items-center gap-3 hover:bg-base-300 transition-colors
                                 ${selectedUser?._id === user._id ? "bg-base-300 ring-1 ring-base-300" : ""}`}
                         >
@@ -119,7 +121,7 @@ function Sidebar() {
                             groups.map((group) => (
                                 <button
                                     key={group._id}
-                                    onClick={() => setSelectedGroup(selectedGroup)}
+                                    onClick={() => {setSelectedUser(null); setSelectedGroup(group)}}
                                     className="w-full p-3 flex items-center gap-3 hover:bg-base-300 transition-colors"
                                 >
                                     <UsersRound className="size-6" />

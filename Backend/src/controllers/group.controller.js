@@ -1,21 +1,32 @@
 import User from "../models/user.model.js"
 import Group from "../models/group.model.js"
-export const create = async (req, res) => {
-    try {
-        const { name, members, createdBy, profilePic } = req.body;
 
-        if (!name || !members || members.length < 2) {
+
+export const create = async (req, res) => {
+    const { name, members, createdBy, profilePic } = req.body;
+    console.log(req.body);
+    
+    try {
+        if (!name || !members || !Array.isArray(members) || members.length < 2) {
             return res.status(400).json({ error: "A group must have a name and at least two members." });
         }
-
-        const newGroup = new Group({ name, members, createdBy, profilePic });
+        if (!createdBy) {
+            return res.status(400).json({ error: "Group creator (createdBy) is required." });
+        }
+        const uniqueMembers = [...new Set(members)];
+        const newGroup = new Group({
+            name,
+            members: uniqueMembers,
+            createdBy,
+            profilePic: profilePic || null, // Default to `null` if no profile picture
+        });
         await newGroup.save();
-        res.json(newGroup);
+        return res.status(201).json(newGroup);
     } catch (error) {
         console.error("Error creating group:", error);
-        res.json({ error: "Internal Server Error" });
+        return res.status(500).json({ error: "Internal Server Error" });
     }
-}
+};
 
 export const addMember = async (req, res) => {
     try {
@@ -33,7 +44,7 @@ export const addMember = async (req, res) => {
 
 export const getGroups = async (req, res) => {
     try {
-        const groups = await Group.find({ members: req.params.userId }).populate("members", "username email");
+        const groups = await Group.find({ members: req.user._id }).populate("members", "username email");
         res.json(groups);
     } catch (error) {
         res.status(500).json({ error: "Error fetching groups" });

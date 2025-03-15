@@ -4,78 +4,82 @@ import { axiosInstance } from "../lib/axios";
 import { useAuthStore } from "./useAuthStore";
 
 export const useGroupStore = create((set, get) => ({
-  groupMessages: {}, // { groupId: [messages] }
+  groupMessages: [],
   selectedGroup: null,
-  isMessagesLoading: false,
+  isGroupMessagesLoading: false,
   isGroupUpdating: false,
   groups: [],
   groupCardOpen: null,
   groupUpdate: null,
 
-  createGroup: async (groupData) =>{
-    console.log(groupData);
-    
+  createGroup: async (groupData) => {
     try {
       const res = await axiosInstance.post("/groups/create", groupData);
+      set((state) => ({ groups: [...state.groups, res.data] }));
+
+
       toast.success("Group created successfully");
     } catch (error) {
       toast.error(error.response.data.message || "Failed to create group");
     }
   },
-  
-  updateGroup: async (data) => {
-    set({ isGroupUpdating: true });
+  getGroups: async () => {
     try {
-      const res = await axiosInstance.put("/auth/update-group", data);
-      set({ groupUpdate: res.data });
-      toast.success("Profile updated successfully");
+      const res = await axiosInstance.get(`/groups`);
+      set({ groups: res.data }); // Store fetched groups
     } catch (error) {
-      console.log("error in update profile:", error);
+      toast.error(error.response?.data?.message || "Failed to fetch groups");
+    }
+  },
+  // updateGroup: async (data) => {
+  //   set({ isGroupUpdating: true });
+  //   try {
+  //     const res = await axiosInstance.put("/auth/update-group", data);
+  //     set({ groupUpdate: res.data });
+  //     toast.success("Profile updated successfully");
+  //   } catch (error) {
+  //     console.log("error in update profile:", error);
+  //     toast.error(error.response.data.message);
+  //   } finally {
+  //     set({ isGroupUpdating: false });
+  //   }
+  // },
+  getGroupMessages: async (groupId) => {
+    set({ isGroupMessagesLoading: true });
+    try {
+      const res = await axiosInstance.get(`/groupMessages/${groupId}`);
+      set({ groupMessages: res.data });
+      
+
+    } catch (error) {
       toast.error(error.response.data.message);
     } finally {
-      set({ isGroupUpdating: false });
+      set({ isGroupMessagesLoading: false });
     }
   },
-
-
-  getGroupMessages: async (groupId) => {
-    set({ isMessagesLoading: true });
+  sendGroupMessage: async (messageData) => {
+    const { selectedGroup, groupMessages } = get();
     try {
-      const res = await axiosInstance.get(`/groups/messages/${groupId}`);
-      set((state) => ({
-        groupMessages: { ...state.groupMessages, [groupId]: res.data },
-      }));
+      const res = await axiosInstance.post(`/groupMessages/${selectedGroup._id}`, messageData);
+      set({ groupMessages: [...groupMessages, res.data] });
+      socket.emit("sendGroupMessage", { groupId, message, senderId });
+
+      console.log("Sending group message:", messageData);
+
     } catch (error) {
-      toast.error(error.response?.data?.message || "Failed to load messages");
-    } finally {
-      set({ isMessagesLoading: false });
+      toast.error(error.response.data.message);
     }
   },
-
-  sendGroupMessage: async (groupId, messageData) => {
-    try {
-      const res = await axiosInstance.post(`/groups/messages/send/${groupId}`, messageData);
-      set((state) => ({
-        groupMessages: {
-          ...state.groupMessages,
-          [groupId]: [...(state.groupMessages[groupId] || []), res.data],
-        },
-      }));
-    } catch (error) {
-      toast.error(error.response?.data?.message || "Failed to send message");
-    }
-  },
-
   joinGroup: (groupId) => {
     const socket = useAuthStore.getState().socket;
     socket.emit("joinGroup", groupId);
   },
-
   subscribeToGroupMessages: (groupId) => {
     const socket = useAuthStore.getState().socket;
-    socket.on("newGroupMessage", (newMessage) => {
+    socket.on("receiveGroupMessage", (newMessage) => {
       if (newMessage.groupId !== groupId) return;
-
+      
+      console.log("Received new group message:", newMessage);
       set((state) => ({
         groupMessages: {
           ...state.groupMessages,
@@ -84,12 +88,10 @@ export const useGroupStore = create((set, get) => ({
       }));
     });
   },
-
-  unsubscribeFromGroupMessages: (groupId) => {
+  unsubscribeFromGroupMessages: () => {
     const socket = useAuthStore.getState().socket;
-    socket.off("newGroupMessage");
+    socket.off("receiveGroupMessage", get().subscribeToGroupMessages);
   },
-
-  setSelectedGroup: (group) => set({ selectedGroup: group }),
+  setSelectedGroup: (selectedGroup) => set({ selectedGroup }),
   setGroupCardOpen: (groupCardOpen) => set({ groupCardOpen }),
 }));
