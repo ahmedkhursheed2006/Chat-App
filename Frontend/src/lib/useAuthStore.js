@@ -98,6 +98,10 @@ export const useAuthStore = create((set, get) => ({
     socket.on("getOnlineUsers", (userIds) => {
       set({ onlineUsers: userIds });
     });
+    socket.on("receiveGroupMessage", (data) => {
+      console.log("New group message received:", data);
+      toast.success(`New message in group ${data.groupId}`);
+    });
   },
   disconnectSocket: () => {
     if (get().socket?.connected) get().socket.disconnect();

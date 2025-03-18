@@ -10,9 +10,9 @@ import { useRef } from "react";
 import { useGroupStore } from "../lib/useGroupStore";
 
 function ChatContainer() {
-    const { messages, getMessages, isMessagesLoading, selectedUser, subscribeToMessages, unSubscribeToMessages } = useChatStore();
+    const { messages, getMessages, isMessagesLoading, selectedUser, subscribeToMessages, unsubscribeFromMessages } = useChatStore();
     const { groupMessages, getGroupMessages, isGroupMessagesLoading, selectedGroup, subscribeToGroupMessages, unsubscribeFromGroupMessages } = useGroupStore();
-    const { authUser } = useAuthStore();
+    const { authUser, socket } = useAuthStore();
     const messageEndRef = useRef(null)
 
 
@@ -20,12 +20,13 @@ function ChatContainer() {
         if (selectedUser && !selectedGroup) {
             getMessages(selectedUser._id);
             subscribeToMessages();
-            return () => unSubscribeToMessages();
+            return () => unsubscribeFromMessages();
         }
-    }, [selectedUser, getMessages, subscribeToMessages, unSubscribeToMessages]);
+    }, [selectedUser, getMessages, subscribeToMessages, unsubscribeFromMessages]);
 
     useEffect(() => {
         if (selectedGroup && !selectedUser) {
+            socket.emit("joinGroup", selectedGroup._id);
             getGroupMessages(selectedGroup._id);
             subscribeToGroupMessages();
             return () => unsubscribeFromGroupMessages();
@@ -71,8 +72,7 @@ function ChatContainer() {
                     </div>
                 ))}
                 {selectedGroup && groupMessages && groupMessages.map((groupMessage) => {
-                    console.log("Message Sender:", groupMessage.senderId);
-                    console.log("Current User:", authUser?._id);
+                    
                     return (
                     
                     <div key={groupMessage._id} className={`chat ${String(groupMessage.senderId) === String(authUser?._id) ? "chat-end" : "chat-start"}`} ref={messageEndRef}>

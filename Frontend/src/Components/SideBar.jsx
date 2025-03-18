@@ -8,7 +8,7 @@ import GroupCard from './GroupCard';
 
 function Sidebar() {
     const { getUsers, users, selectedUser, setSelectedUser, isUsersLoading } = useChatStore();
-    const { setGroupCardOpen, groupCardOpen, setSelectedGroup, groups, getGroups } = useGroupStore();
+    const { setGroupCardOpen, groupCardOpen, selectedGroup, setSelectedGroup, groups, getGroups } = useGroupStore();
     const { onlineUsers } = useAuthStore();
 
 
@@ -122,7 +122,8 @@ function Sidebar() {
                                 <button
                                     key={group._id}
                                     onClick={() => {setSelectedUser(null); setSelectedGroup(group)}}
-                                    className="w-full p-3 flex items-center gap-3 hover:bg-base-300 transition-colors"
+                                    className={`w-full p-3 flex items-center gap-3 hover:bg-base-300 transition-colors
+                                        ${selectedGroup?._id === group._id ? "bg-base-300 ring-1 ring-base-300" : ""}`}
                                 >
                                     <UsersRound className="size-6" />
                                     <span className='hidden lg:block'>{group.name}</span>

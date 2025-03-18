@@ -29,37 +29,36 @@ function MessageInput() {
 
     const handleSendMessage = async (e) => {
         e.preventDefault();
-        if (selectedGroup && !selectedUser) {
-            if (!text.trim() && !previewImage) return;
-            try {
-                await sendGroupMessage({
-                    text: text.trim(),
-                    image: previewImage,
-                })
-                setText("");
-                setPreviewImage(null)
-                if (fileInputRef.current) fileInputRef.current.value = "";
-            } catch (error) {
-                console.log("Failed to send Message:", error);
-
+        if (!text.trim() && !previewImage) return;
+    
+        const messageData = {
+            text: text.trim(),
+            image: previewImage,
+        };
+    
+        try {
+    
+            let response;
+            if (selectedGroup && !selectedUser) {
+                response = await sendGroupMessage(messageData);
+            } else if (selectedUser && !selectedGroup) {
+                response = await sendMessage(messageData);
+            } else {
+                console.log("No valid recipient found.");
+                return;
             }
+    
+            console.log("Message sent successfully:", response?.data || "No data returned");
+    
+            setText("");
+            setPreviewImage(null);
+            if (fileInputRef.current) fileInputRef.current.value = "";
+        } catch (error) {
+            console.error("Failed to send message:", error);
         }
-        if (selectedUser && !selectedGroup) {
-            if (!text.trim() && !previewImage) return;
-            try {
-                await sendMessage({
-                    text: text.trim(),
-                    image: previewImage,
-                })
-                setText("");
-                setPreviewImage(null)
-                if (fileInputRef.current) fileInputRef.current.value = "";
-            } catch (error) {
-                console.log("Failed to send Message:", error);
+    };
+    
 
-            }
-        }
-    }
 
 
     return (

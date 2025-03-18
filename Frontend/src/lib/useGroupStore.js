@@ -49,7 +49,7 @@ export const useGroupStore = create((set, get) => ({
     try {
       const res = await axiosInstance.get(`/groupMessages/${groupId}`);
       set({ groupMessages: res.data });
-      
+
 
     } catch (error) {
       toast.error(error.response.data.message);
@@ -60,11 +60,11 @@ export const useGroupStore = create((set, get) => ({
   sendGroupMessage: async (messageData) => {
     const { selectedGroup, groupMessages } = get();
     try {
+      console.log("Sending group message to API:", messageData);
       const res = await axiosInstance.post(`/groupMessages/${selectedGroup._id}`, messageData);
+      console.log("API Response:", res);
       set({ groupMessages: [...groupMessages, res.data] });
-      socket.emit("sendGroupMessage", { groupId, message, senderId });
-
-      console.log("Sending group message:", messageData);
+      return res;
 
     } catch (error) {
       toast.error(error.response.data.message);
@@ -78,19 +78,17 @@ export const useGroupStore = create((set, get) => ({
     const socket = useAuthStore.getState().socket;
     socket.on("receiveGroupMessage", (newMessage) => {
       if (newMessage.groupId !== groupId) return;
-      
+
       console.log("Received new group message:", newMessage);
       set((state) => ({
-        groupMessages: {
-          ...state.groupMessages,
-          [groupId]: [...(state.groupMessages[groupId] || []), newMessage],
-        },
+        groupMessages: [...state.groupMessages, data.message],
       }));
+
     });
   },
   unsubscribeFromGroupMessages: () => {
     const socket = useAuthStore.getState().socket;
-    socket.off("receiveGroupMessage", get().subscribeToGroupMessages);
+    socket.off("receiveGroupMessage");
   },
   setSelectedGroup: (selectedGroup) => set({ selectedGroup }),
   setGroupCardOpen: (groupCardOpen) => set({ groupCardOpen }),

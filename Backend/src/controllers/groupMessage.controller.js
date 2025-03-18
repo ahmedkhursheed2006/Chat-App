@@ -1,6 +1,6 @@
 import GroupMessage from "../models/groupMessage.model.js";
 import Group from "../models/group.model.js";
-import { io, getReceiverSocketId } from "../lib/socket.js";
+import { io } from "../lib/socket.js";
 import cloudinary from "../lib/cloudinary.js";
 
 
@@ -9,7 +9,7 @@ export const sendGroupMessage = async (req, res) => {
 
     try {
         const { groupId } = req.params;
-        const { text, image , } = req.body;
+        const { text, image } = req.body;
         const senderId = req.user._id;
 
         let imageUrl;
@@ -34,7 +34,7 @@ export const sendGroupMessage = async (req, res) => {
 
 
         if (groupId) {
-            io.to(groupId).emit("receiveGroupMessage", newMessage);
+            io.to(groupId).emit("sendGroupMessage", newMessage);
         }
 
         res.status(201).json(newMessage);
@@ -58,7 +58,7 @@ export const getGroupMessages = async (req, res) => {
         messages.forEach((msg) => {
             msg.senderId = msg.senderId?._id.toString();  // Ensure it's a string
         });
-
+        
         console.log(messages);
 
         res.status(200).json(messages);
