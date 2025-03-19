@@ -3,6 +3,8 @@ import toast from "react-hot-toast";
 import { axiosInstance } from "../lib/axios";
 import { useAuthStore } from "./useAuthStore";
 
+const socket = useAuthStore.getState().socket;
+
 export const useGroupStore = create((set, get) => ({
   groupMessages: [],
   selectedGroup: null,
@@ -12,15 +14,15 @@ export const useGroupStore = create((set, get) => ({
   groupCardOpen: null,
   groupUpdate: null,
 
+  // API calls
   createGroup: async (groupData) => {
     try {
       const res = await axiosInstance.post("/groups/create", groupData);
       set((state) => ({ groups: [...state.groups, res.data] }));
-
-
       toast.success("Group created successfully");
+      socket.emit("joinGroup", res.data._id); // Automatically join the new group
     } catch (error) {
-      toast.error(error.response.data.message || "Failed to create group");
+      toast.error(error.response?.data?.message || "Failed to create group");
     }
   },
   getGroups: async () => {
@@ -31,28 +33,13 @@ export const useGroupStore = create((set, get) => ({
       toast.error(error.response?.data?.message || "Failed to fetch groups");
     }
   },
-  // updateGroup: async (data) => {
-  //   set({ isGroupUpdating: true });
-  //   try {
-  //     const res = await axiosInstance.put("/auth/update-group", data);
-  //     set({ groupUpdate: res.data });
-  //     toast.success("Profile updated successfully");
-  //   } catch (error) {
-  //     console.log("error in update profile:", error);
-  //     toast.error(error.response.data.message);
-  //   } finally {
-  //     set({ isGroupUpdating: false });
-  //   }
-  // },
   getGroupMessages: async (groupId) => {
     set({ isGroupMessagesLoading: true });
     try {
       const res = await axiosInstance.get(`/groupMessages/${groupId}`);
       set({ groupMessages: res.data });
-
-
     } catch (error) {
-      toast.error(error.response.data.message);
+      toast.error(error.response.data.message || "Failed to fetch group messages");
     } finally {
       set({ isGroupMessagesLoading: false });
     }
@@ -64,32 +51,31 @@ export const useGroupStore = create((set, get) => ({
       const res = await axiosInstance.post(`/groupMessages/${selectedGroup._id}`, messageData);
       console.log("API Response:", res);
       set({ groupMessages: [...groupMessages, res.data] });
+      socket.emit("sendGroupMessage", { groupId: selectedGroup._id, message: res.data, senderId: messageData.senderId });
       return res;
-
     } catch (error) {
-      toast.error(error.response.data.message);
+      toast.error(error.response?.data?.message || "Failed to send group message");
     }
   },
+
+  // Socket handling
   joinGroup: (groupId) => {
-    const socket = useAuthStore.getState().socket;
     socket.emit("joinGroup", groupId);
   },
   subscribeToGroupMessages: (groupId) => {
-    const socket = useAuthStore.getState().socket;
     socket.on("receiveGroupMessage", (newMessage) => {
       if (newMessage.groupId !== groupId) return;
-
       console.log("Received new group message:", newMessage);
       set((state) => ({
-        groupMessages: [...state.groupMessages, data.message],
+        groupMessages: [...state.groupMessages, newMessage],
       }));
-
     });
   },
   unsubscribeFromGroupMessages: () => {
-    const socket = useAuthStore.getState().socket;
     socket.off("receiveGroupMessage");
   },
+
+  // State setters
   setSelectedGroup: (selectedGroup) => set({ selectedGroup }),
   setGroupCardOpen: (groupCardOpen) => set({ groupCardOpen }),
 }));
