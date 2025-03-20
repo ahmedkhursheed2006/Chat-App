@@ -3,14 +3,13 @@ import Group from "../models/group.model.js";
 import { io } from "../lib/socket.js";
 import cloudinary from "../lib/cloudinary.js";
 
-
 export const sendGroupMessage = async (req, res) => {
-
-
     try {
         const { groupId } = req.params;
         const { text, image } = req.body;
         const senderId = req.user._id;
+
+        console.log("Request user:", req.user); // Debugging statement
 
         let imageUrl;
         if (image) {
@@ -31,9 +30,10 @@ export const sendGroupMessage = async (req, res) => {
         });
 
         await newMessage.save();
-
-
+        
         if (groupId) {
+            console.log("groupID : ", groupId );
+            
             io.to(groupId).emit("sendGroupMessage", newMessage);
         }
 
@@ -43,13 +43,15 @@ export const sendGroupMessage = async (req, res) => {
         res.status(500).json({ message: "Error sending message" });
     }
 };
+
 export const getGroupMessages = async (req, res) => {
     const { groupId } = req.params;
     const myId = req.user._id;
+
+    console.log("Request user:", req.user); // Debugging statement
     console.log(groupId);
     console.log(myId);
     console.log("Emitting group message to:", groupId);
-
 
     try {
         const messages = await GroupMessage.find({ groupId }).populate("senderId", "username profilePic").lean(); // Convert Mongoose objects to plain JSON
@@ -67,4 +69,3 @@ export const getGroupMessages = async (req, res) => {
         res.status(500).json({ message: "Error fetching messages" });
     }
 };
-

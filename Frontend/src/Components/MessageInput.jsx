@@ -2,6 +2,7 @@ import React, { useRef, useState } from 'react'
 import { useChatStore } from '../lib/useChatStore';
 import { Image, Send, X } from 'lucide-react';
 import { useGroupStore } from '../lib/useGroupStore';
+import { useAuthStore } from '../lib/useAuthStore';
 
 function MessageInput() {
 
@@ -10,6 +11,9 @@ function MessageInput() {
     const fileInputRef = useRef(null);
     const { sendMessage, selectedUser } = useChatStore();
     const { sendGroupMessage, selectedGroup } = useGroupStore();
+    const {authUser} = useAuthStore();
+    
+    
 
     const handleImageChange = (e) => {
         const file = e.target.files[0];
@@ -34,14 +38,15 @@ function MessageInput() {
         const messageData = {
             text: text.trim(),
             image: previewImage,
+            senderId : authUser?._id
         };
     
         try {
     
             let response;
-            if (selectedGroup && !selectedUser) {
+            if (selectedGroup && (selectedUser === null)) {
                 response = await sendGroupMessage(messageData);
-            } else if (selectedUser && !selectedGroup) {
+            } else if (selectedUser && (selectedGroup === null)) {
                 response = await sendMessage(messageData);
             } else {
                 console.log("No valid recipient found.");
