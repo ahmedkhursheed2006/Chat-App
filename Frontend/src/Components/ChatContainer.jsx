@@ -1,5 +1,6 @@
-import { useEffect, useRef, useMemo, useState } from "react";
+import { useEffect, useRef, useMemo } from "react";
 import React from "react";
+import { Link } from "react-router";
 import { useChatStore } from "../lib/useChatStore";
 import { useAuthStore } from "../lib/useAuthStore";
 import { useGroupStore } from "../lib/useGroupStore";
@@ -40,7 +41,7 @@ const Message = ({ message, isSender, senderProfilePic }) => (
 );
 
 function ChatContainer() {
-    // const [isSocketConnected, setIsSocketConnected] = useState(false);
+
 
     const messageEndRef = useRef(null);
     const { authUser, socket } = useAuthStore();
@@ -62,21 +63,6 @@ function ChatContainer() {
         unsubscribeFromGroupMessages
     } = useGroupStore();
 
-    // useEffect(() => {
-    //     if (!socket) return;
-
-    //     const handleConnect = () => setIsSocketConnected(true);
-    //     const handleDisconnect = () => setIsSocketConnected(false);
-
-    //     socket.on("connect", handleConnect);
-    //     socket.on("disconnect", handleDisconnect);
-
-    //     return () => {
-    //         socket.off("connect", handleConnect);
-    //         socket.off("disconnect", handleDisconnect);
-    //     };
-    // }, [socket]);
-    // Determine current chat context
     const currentChat = useMemo(() => ({
         id: selectedGroup?._id || selectedUser?._id,
         messages: selectedGroup ? groupMessages : messages,
@@ -89,7 +75,6 @@ function ChatContainer() {
         if (!currentChat.id || !socket) return;
 
         if (currentChat.isGroup) {
-            socket.emit("joinGroup", currentChat.id);
             getGroupMessages(currentChat.id);
             subscribeToGroupMessages();
             return () => unsubscribeFromGroupMessages();
@@ -104,21 +89,12 @@ function ChatContainer() {
     useEffect(() => {
         messageEndRef.current?.scrollIntoView({ behavior: "smooth" });
     }, [currentChat.messages]);
-    useEffect(() => {
-        const interval = setInterval(() => {
-            if (socket && !socket.connected) {
-                socket.connect();
-            }
-        }, 5000); // Reconnect every 5s if disconnected
-
-        return () => clearInterval(interval);
-    }, [socket]);
 
     if (isMessagesLoading || isGroupMessagesLoading) {
         return (
             <div className="flex-1 flex flex-col overflow-auto">
-                <ChatHeader/>
-                
+                <ChatHeader />
+
                 <MessageSkeleton />
                 <MessageInput />
             </div>
@@ -126,9 +102,11 @@ function ChatContainer() {
     }
 
     return (
-        <div className="flex flex-1 flex-col overflow-auto border-4 border-l-0 border-[#ccc] p-2 rounded-r-lg">
+        <div className="flex flex-1 flex-col overflow-auto p-2 rounded-r-lg">
+            <Link to={`/:id/profile`}>
             <ChatHeader/>
-               
+            </Link>
+
             <div className="flex-1 overflow-y-auto p-4 space-y-4">
                 {currentChat.messages?.map((message) => (
                     <Message

@@ -4,7 +4,6 @@ import Group from "../models/group.model.js"
 
 export const create = async (req, res) => {
     const { name, members, createdBy, profilePic } = req.body;
-    console.log(req.body);
     
     try {
         if (!name || !members || !Array.isArray(members) || members.length < 2) {
@@ -23,7 +22,6 @@ export const create = async (req, res) => {
         await newGroup.save();
         return res.status(201).json(newGroup);
     } catch (error) {
-        console.error("Error creating group:", error);
         return res.status(500).json({ error: "Internal Server Error" });
     }
 };

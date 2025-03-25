@@ -7,9 +7,8 @@ export const sendGroupMessage = async (req, res) => {
     try {
         const { groupId } = req.params;
         const { text, image } = req.body;
-        const senderId = req.user._id;
+        const senderId = req.user._id; 
 
-        console.log("Request user:", req.user); // Debugging statement
 
         let imageUrl;
         if (image) {
@@ -32,9 +31,8 @@ export const sendGroupMessage = async (req, res) => {
         await newMessage.save();
         
         if (groupId) {
-            console.log("groupID : ", groupId );
             
-            io.to(groupId).emit("sendGroupMessage", newMessage);
+            io.to(groupId).emit("newGroupMessage", newMessage);
         }
 
         res.status(201).json(newMessage);
@@ -48,10 +46,7 @@ export const getGroupMessages = async (req, res) => {
     const { groupId } = req.params;
     const myId = req.user._id;
 
-    console.log("Request user:", req.user); // Debugging statement
-    console.log(groupId);
-    console.log(myId);
-    console.log("Emitting group message to:", groupId);
+  
 
     try {
         const messages = await GroupMessage.find({ groupId }).populate("senderId", "username profilePic").lean(); // Convert Mongoose objects to plain JSON
@@ -61,7 +56,6 @@ export const getGroupMessages = async (req, res) => {
             msg.senderId = msg.senderId?._id.toString();  // Ensure it's a string
         });
         
-        console.log(messages);
 
         res.status(200).json(messages);
     } catch (error) {

@@ -12,9 +12,9 @@ function HomePage() {
 
 
     return (
-        <div className='h-screen'>
-            <div className='flex items-center justify-center pt-20 px-4 h-full'>
-                <div className='rounded-lg shadow-cl w-full max-w-6xl h-full'>
+        <div className='h-screen w-full'>
+            <div className='flex justify-center pt-13 h-full w-full'>
+                <div className='rounded-lg shadow-cl w-full h-full'>
                     <div className='flex h-full rounded-lg overflow-hidden gap-1'>
                         <SideBar />
 

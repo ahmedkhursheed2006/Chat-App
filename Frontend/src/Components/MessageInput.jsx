@@ -53,7 +53,6 @@ function MessageInput() {
                 return;
             }
     
-            console.log("Message sent successfully:", response?.data || "No data returned");
     
             setText("");
             setPreviewImage(null);

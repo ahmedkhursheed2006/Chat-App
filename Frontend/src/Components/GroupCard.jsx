@@ -26,7 +26,6 @@ function GroupCard() {
         createdBy: authUser._id,
         profilePic: selectedImage || null,
     };
-    console.log("Sending data to backend:", newGroup);
     try {
         const response = await fetch("http://localhost:5000/api/groups/create", {
             method: "POST",
@@ -34,14 +33,11 @@ function GroupCard() {
             body: JSON.stringify(newGroup),
         });
         const data = await response.json();
-        console.log("Backend Response:", data);
         if (!response.ok) {
             throw new Error(data.error || "Failed to create group");
         }
-        console.log("Group Created Successfully!", data);
         toast.success("Group Created Successfully!");
     } catch (error) {
-        console.error("Error creating group:", error.message);
         toast.error(error.message);
     }
 };

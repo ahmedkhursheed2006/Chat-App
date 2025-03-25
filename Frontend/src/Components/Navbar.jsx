@@ -13,18 +13,16 @@ function Navbar() {
 
     return (
         <header
-            className='fixed bg-transparent backdrop-blur-lg w-full top-0 z-40'
+            className='fixed bg-transparent backdrop-blur-lg w-full top-0 z-40 py-1'
         >
-            <div className='container mx-auto px-4 h-16'>
+            <div className='container mx-auto px-4 h-10'>
                 <div className='flex items-center justify-between h-full'>
                     <Link to={`/`} className='flex items-center gap-2.5 hover:opacity-80 transition-all'>
-                        <img src={ChatAppLogo} alt="App Logo" className='size-20' />
+                        <img src={ChatAppLogo} alt="App Logo" className='size-15' />
                         <h1 className='text-lg font-bold`'>BINGO</h1>
                     </Link>
                     <div className='flex items-center gap-5'>
-                        <Link to={`/settings`}>
-                            <IoSettings className='size-5 hover:animate-spin hover:size-7' />
-                        </Link>
+                       
                         {authUser && (
                             <>
                                 <Link to={`/profile`}>
